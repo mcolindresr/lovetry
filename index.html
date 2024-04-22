@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Perdón</title>
+    <style>
+        /* Estilos CSS previos */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden; /* Evita el desplazamiento vertical */
+            position: relative; /* Importante para el posicionamiento de los corazones */
+        }
+
+        .container {
+            text-align: center;
+            position: relative; /* Necesario para la animación */
+            max-width: 90%; /* Ajuste de ancho máximo */
+            margin: auto; /* Centrado horizontal */
+        }
+
+        .sad-image {
+            max-width: 65%;
+            border-radius: 50%;
+        }
+
+        #fun-message {
+            margin-top: 20px;
+            font-size: 20px;
+            color: red;
+        }
+
+        .forgiveness-question button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .forgiveness-question button:hover {
+            background-color: #45a049;
+        }
+
+        .progress-bar-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .progress-bar {
+            width: 90%; /* Ajuste de ancho máximo */
+            max-width: 300px; /* Ajuste de ancho máximo */
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 20px;
+            background-color: #4CAF50;
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* Animación de lluvia de corazones */
+        @keyframes heart-fall {
+            0% { transform: translateY(-200vh) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            clip-path: polygon(50% 15%, 60% 0, 70% 15%, 100% 65%, 80% 100%, 50% 80%, 20% 100%, 0 65%, 30% 15%);
+            animation: heart-fall 3s linear infinite;
+            left: calc(100vw * var(--rand-x)); /* Posición aleatoria horizontalmente */
+            top: calc(-100vh * var(--rand-y)); /* Posición aleatoria verticalmente */
+            animation-delay: calc(-3s * var(--rand-delay)); /* Retraso aleatorio de la animación */
+        }
+
+        /* Estilos de la modal */
+        .modal {
+            display: none; /* Oculta la modal por defecto */
+            position: fixed; /* Se posiciona encima del contenido */
+            z-index: 1; /* Coloca la modal sobre el resto del contenido */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Permite desplazamiento si la modal es más grande que la pantalla */
+            background-color: rgba(0,0,0,0.4); /* Fondo semitransparente */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* Centra la modal vertical y horizontalmente */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Ancho de la modal */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* Estilos para los botones */
+        #gratitude-message button,
+        #try-again button,
+        #rethink-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: white;
+        }
+
+        #gratitude-message button,
+        #rethink-button {
+            background-color: #87CEFA; /* Azul celeste */
+        }
+
+        #try-again button {
+            background-color: #333; /* Negro */
+        }
+
+        #gratitude-message button:hover,
+        #try-again button:hover,
+        #rethink-button:hover {
+            background-color: #4682B4; /* Cambio de color al hacer hover */
+        }
+        
+        /* Ocultar el botón hasta que se dé clic en Sí */
+        #rethink-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="progress-bar-container">
+            <h2>Corazón de Migue!</h2>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" style="width: 100%;"></div>
+            </div>
+            <div class="progress-text">100%</div>
+        </div>
+        <br>
+        <img class="sad-image" src="https://cdn-icons-png.flaticon.com/512/9350/9350406.png" alt="Imagen triste">
+        <div class="forgiveness-question">
+            <p>¿Me perdonas?</p>
+            <button id="yes-button">Sí</button>
+            <button id="no-button">No</button>
+            <button id="rethink-button" onclick="window.location.reload();">Mejor lo voy a pensar de nuevo</button>
+        </div>
+        <div id="gratitude-message">
+            <!-- Aquí aparecerá el mensaje de agradecimiento -->
+        </div>
+        <div id="fun-message"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p>En el silencio de la noche, </p>
+            <p>cuando las estrellas se asoman tímidas en el firmamento, </p>
+            <p>los susurros del viento acarician suavemente los recuerdos que se agolpan en el alma. </p>
+            <p>Es en ese instante mágico donde las palabras encuentran su eco más profundo, </p>
+            <p>donde los sueños se entrelazan con la realidad en una danza etérea.</p>
+            <br>
+            <p>Bajo el manto oscuro de la noche, los pensamientos se deslizan como hojas en el viento, </p>
+            <p>llevando consigo anhelos y anhelos, esperanzas y deseos. </p>
+            <p>Cada suspiro es una melodía perdida en el universo, </p>
+            <p>cada latido un eco de emociones que resuenan en lo más íntimo del ser.</p>
+        </div>
+    </div>
+
+    <script>
+        const yesButton = document.getElementById('yes-button');
+        const noButton = document.getElementById('no-button');
+        const rethinkButton = document.getElementById('rethink-button');
+        const funMessage = document.getElementById('fun-message');
+        const gratitudeMessageContainer = document.getElementById('gratitude-message');
+        const container = document.getElementById('container');
+        const progressBarFill = document.querySelector('.progress-bar-fill');
+        const progressText = document.querySelector('.progress-text');
+
+        const messages = [
+            "¡Sos tan cruel! 😢",
+            "¡Pensé que me querías! 💔",
+            "No des más al no, que muero. 😭",
+            "¡Pero un besito no le dan a uno! 😔", 
+            "¡Ojalá se te funda el mouse! 😢",
+            "¡Te quiero, estás a tiempo de reflexionar aún! 😔"
+        ];
+
+        let progress = 100;
+        let buttonTextIndex = 0;
+        let shownMessages = [];
+
+        noButton.addEventListener('click', () => {
+            if (progress <= 10 && buttonTextIndex === 0) {
+                // Congelar el progreso en el 10% y cambiar el texto del botón "No"
+                progress = 10;
+                progressBarFill.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+                
+                const buttonText = ['¿Estás segura que no?', '¿Segurísima?', '¿Hipermega segura?'];
+                noButton.textContent = buttonText[buttonTextIndex];
+                buttonTextIndex++;
+                return;
+            }
+
+            let remainingMessages = messages.filter(message => !shownMessages.includes(message));
+            const randomIndex = Math.floor(Math.random() * remainingMessages.length);
+            const selectedMessage = remainingMessages[randomIndex];
+            shownMessages.push(selectedMessage);
+
+            funMessage.textContent = selectedMessage;
+            funMessage.style.display = 'block';
+            
+            progress -= 15;
+            if (progress < 0) {
+                progress = 0;
+            }
+            progressBarFill.style.width = `${progress}%`;
+            progressText.textContent = `${progress}%`;
+
+            if (noButton.textContent === '¿Estás segura que no?') {
+                // Eliminar el contenido actual y mostrar la animación de temblor
+                container.innerHTML = `
+                    <img class="broken-heart-image" style="width:100%;height:100%;" src="images/prb.png" alt="Corazón roto">
+                    <div id="try-again">
+                        <button onclick="window.location.reload();">Clic aquí para reflexionar e intentar de nuevo</button>
+                    </div>
+                `;
+            }
+        });
+        yesButton.addEventListener('click', () => {
+            // Lógica para el botón "Sí"
+            const gratitudeMessage = "<h1>¡Gracias por perdonarme chiquita hermosa! 💖</h1>";
+            gratitudeMessageContainer.innerHTML = gratitudeMessage + '<button onclick="openModal()">Leer poema</button>';
+            funMessage.textContent = gratitudeMessage;
+            funMessage.style.display = 'block';
+            progressBarFill.style.width = '100%';
+            progressText.textContent = '100%';
+            // Ocultar la pregunta de perdón
+            container.innerHTML = `
+                <div id="gratitude-message">
+                    ${gratitudeMessage}
+                    <button onclick="openModal()">Leer poema</button>
+                    <button id="rethink-button" onclick="window.location.reload();">Mejor lo voy a pensar de nuevo</button>
+                    <button onclick="window.location.reload();">Me arrepiento de perdonarte</button>
+                </div>
+            `;
+            // Mostrar el botón de repensar
+            rethinkButton.style.display = 'inline-block';
+            // Crear corazones y agregarlos al contenedor
+            for (let i = 0; i < 500; i++) { // Cambia el número para tener más o menos corazones
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.setProperty('--rand-x', Math.random());
+                heart.style.setProperty('--rand-y', Math.random());
+                heart.style.setProperty('--rand-delay', Math.random());
+                document.body.appendChild(heart); // Agregar al body para llenar toda la pantalla
+            }
+        });
+
+        // Función para abrir la modal
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        // Función para cerrar la modal
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // Cierra la modal si se hace clic fuera de ella
+        window.onclick = function(event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
