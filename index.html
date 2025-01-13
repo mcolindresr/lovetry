@@ -220,12 +220,12 @@
         const progressText = document.querySelector('.progress-text');
 
         const messages = [
-            "¡Sos tan cruel! 😢",
-            "¡Pensé que me querías! 💔",
-            "No des más al no, que muero. 😭",
+            "¡Es tan cruel! 😢",
+            "¡Pensé que me quería! 💔",
+            "No de más al no, que muero. 😭",
             "¡Pero un besito no le dan a uno! 😔", 
-            "¡Ojalá se te funda el mouse! 😢",
-            "¡Te quiero, estás a tiempo de reflexionar aún! 😔"
+            "¡Ojalá se le funda el mouse! 😢",
+            "¡La quiero, está a tiempo de reflexionar aún! 😔"
         ];
 
         let progress = 100;
@@ -272,7 +272,7 @@
         });
         yesButton.addEventListener('click', () => {
             // Lógica para el botón "Sí"
-            const gratitudeMessage = "<h1>¡Gracias por perdonarme chiquita hermosa! 💖</h1>";
+            const gratitudeMessage = "<h1>¡Gracias por perdonarme princesa hermosa! 💖</h1>";
             gratitudeMessageContainer.innerHTML = gratitudeMessage + '<button onclick="openModal()">Leer poema</button>';
             funMessage.textContent = gratitudeMessage;
             funMessage.style.display = 'block';
